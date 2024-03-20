@@ -74,12 +74,12 @@ def train_model(model, dataset, look_ahead, shuffle_mask, nb_shuffle_per_valid, 
     for i in range(trainer_status["nb_shuffles"]):
         model.shuffle(shuffling_type)
 
-    print '\n### Training MADE ###'
+    print('\n### Training MADE ###')
     while(trainer_status["epoch"] < max_epochs and trainer_status["nb_of_epocs_without_improvement"] < look_ahead):
         trainer_status["epoch"] += 1
 
-        print 'Epoch {0} (Batch Size {1})'.format(trainer_status["epoch"], batch_size)
-        print '\tTraining   ...',
+        print('Epoch {0} (Batch Size {1})'.format(trainer_status["epoch"], batch_size))
+        print('\tTraining   ...',)
         start_time = t.time()
         nb_iterations = int(np.ceil(dataset['train']['length'] / batch_size))
         train_err = 0
@@ -94,16 +94,16 @@ def train_model(model, dataset, look_ahead, shuffle_mask, nb_shuffle_per_valid, 
                     model.shuffle(shuffling_type)
                     trainer_status["nb_shuffles"] += 1
 
-        print utils.get_done_text(start_time), " avg NLL: {0:.6f}".format(train_err / nb_iterations)
+        print(utils.get_done_text(start_time), " avg NLL: {0:.6f}".format(train_err / nb_iterations))
 
-        print '\tValidating ...',
+        print('\tValidating ...',)
         start_time = t.time()
         if shuffle_mask > 0:
             model.reset(shuffling_type)
         valid_err, valid_err_std = get_mean_error_and_std(model, model.valid_log_prob, dataset['valid']['length'], shuffle_mask, shuffling_type, nb_shuffle_per_valid)
         if shuffle_mask > 0:
             model.reset(shuffling_type, trainer_status["nb_shuffles"])
-        print utils.get_done_text(start_time), " NLL: {0:.6f}".format(valid_err)
+        print(utils.get_done_text(start_time), " NLL: {0:.6f}".format(valid_err))
 
         if valid_err < trainer_status["best_valid_error"]:
             trainer_status["best_valid_error"] = valid_err
@@ -116,40 +116,40 @@ def train_model(model, dataset, look_ahead, shuffle_mask, nb_shuffle_per_valid, 
         else:
             trainer_status["nb_of_epocs_without_improvement"] += 1
 
-    print "### Training", utils.get_done_text(start_training_time), "###"
+    print("### Training", utils.get_done_text(start_training_time), "###")
     total_train_time = t.time() - start_training_time
     return trainer_status["best_epoch"], total_train_time
 
 
 def build_model(dataset, trainingparams, hyperparams, hidden_sizes):
-    print '\n### Initializing MADE ... ',
+    print('\n### Initializing MADE ... ',)
     start_time = t.time()
     model = MADE(dataset,
-                 learning_rate=trainingparams['learning_rate'],
-                 decrease_constant=trainingparams['decrease_constant'],
-                 hidden_sizes=hidden_sizes,
-                 random_seed=hyperparams['random_seed'],
-                 batch_size=trainingparams['batch_size'],
-                 hidden_activation=activation_functions[hyperparams['hidden_activation']],
-                 use_cond_mask=hyperparams['use_cond_mask'],
-                 direct_input_connect=hyperparams['direct_input_connect'],
-                 direct_output_connect=hyperparams['direct_output_connect'],
-                 update_rule=trainingparams['update_rule'],
-                 dropout_rate=trainingparams['dropout_rate'],
-                 weights_initialization=hyperparams['weights_initialization'],
-                 mask_distribution=hyperparams['mask_distribution'])
-    print utils.get_done_text(start_time), "###"
+                learning_rate=trainingparams['learning_rate'],
+                decrease_constant=trainingparams['decrease_constant'],
+                hidden_sizes=hidden_sizes,
+                random_seed=hyperparams['random_seed'],
+                batch_size=trainingparams['batch_size'],
+                hidden_activation=activation_functions[hyperparams['hidden_activation']],
+                use_cond_mask=hyperparams['use_cond_mask'],
+                direct_input_connect=hyperparams['direct_input_connect'],
+                direct_output_connect=hyperparams['direct_output_connect'],
+                update_rule=trainingparams['update_rule'],
+                dropout_rate=trainingparams['dropout_rate'],
+                weights_initialization=hyperparams['weights_initialization'],
+                mask_distribution=hyperparams['mask_distribution'])
+    print(utils.get_done_text(start_time), "###")
     return model
 
 
 def build_model_layer_pretraining(dataset, trainingparams, hyperparams, max_epochs):
 
-    print '\n#### Pretraining layer {} ####'.format(1),
+    print('\n#### Pretraining layer {} ####'.format(1),)
     model = build_model(dataset, trainingparams, hyperparams, hyperparams['hidden_sizes'][:1])
     best_model, best_epoch, total_train_time = train_model(model, dataset, trainingparams['look_ahead'], trainingparams['shuffle_mask'], trainingparams['nb_shuffle_per_valid'], max_epochs, trainingparams['batch_size'], trainingparams['shuffling_type'])
 
     for i in range(2, len(hyperparams['hidden_sizes']) + 1):
-        print '\n#### Pretraining layer {} ####'.format(i),
+        print('\n#### Pretraining layer {} ####'.format(i),)
         model = build_model(dataset, trainingparams, hyperparams, hyperparams['hidden_sizes'][:i])
 
         # Set pre-trained layers
@@ -261,12 +261,12 @@ if __name__ == '__main__':
     save_path_experiment = os.path.join('./experiments/', experiment_name)
     if os.path.isdir(save_path_experiment):
         if not args.force:
-            print "### Resuming experiment ({0}). ###\n".format(experiment_name)
+            print("### Resuming experiment ({0}). ###\n".format(experiment_name))
             loaded_hyperparams = utils.load_dict_from_json_file(os.path.join(save_path_experiment, "hyperparams"))
             loaded_trainingparams = utils.load_dict_from_json_file(os.path.join(save_path_experiment, "trainingparams"))
 
             if loaded_trainingparams != trainingparams or loaded_hyperparams != hyperparams:
-                print "The arguments provided are different than the one saved. Use --force if you are certain.\nQuitting."
+                print("The arguments provided are different than the one saved. Use --force if you are certain.\nQuitting.")
                 exit()
 
             resume_mode = True
@@ -307,7 +307,7 @@ if __name__ == '__main__':
     #
     # EVALUATING BEST MODEL ####
     model_evaluation = {}
-    print '\n### Evaluating best model from Epoch {0} ###'.format(best_epoch)
+    print('\n### Evaluating best model from Epoch {0} ###'.format(best_epoch))
     for log_prob_func_name in ['test', 'valid', 'train']:
         if trainingparams['shuffle_mask'] > 0:
             model.reset(trainingparams['shuffling_type'])
@@ -315,7 +315,7 @@ if __name__ == '__main__':
             model_evaluation[log_prob_func_name] = get_mean_error_and_std_final(model, model.train_log_prob_batch, dataset[log_prob_func_name]['length'], trainingparams['shuffle_mask'], trainingparams['shuffling_type'], 1000)
         else:
             model_evaluation[log_prob_func_name] = get_mean_error_and_std(model, model.__dict__['{}_log_prob'.format(log_prob_func_name)], dataset[log_prob_func_name]['length'], trainingparams['shuffle_mask'], trainingparams['shuffling_type'], 1000)
-        print "\tBest {1} error is : {0:.6f}".format(model_evaluation[log_prob_func_name][0], log_prob_func_name.upper())
+        print("\tBest {1} error is : {0:.6f}".format(model_evaluation[log_prob_func_name][0], log_prob_func_name.upper()))
 
     #
     # WRITING RESULTS #####

@@ -36,8 +36,8 @@ class MaskGenerator(object):
             self.layers_connectivity_updates += [self._get_hidden_layer_connectivity(i)]
         # self.layers_connectivity_updates = [self._get_hidden_layer_connectivity(i) for i in range(len(self._hidden_sizes))]  # WTF THIS DO NOT WORK
         self.sample_connectivity = theano.function(name='sample_connectivity',
-                                                   inputs=[],
-                                                   updates=[(self.layers_connectivity[i+1], self.layers_connectivity_updates[i]) for i in range(len(self._hidden_sizes))])
+                                                    inputs=[],
+                                                    updates=[(self.layers_connectivity[i+1], self.layers_connectivity_updates[i]) for i in range(len(self._hidden_sizes))])
 
         # Save random initial state
         self._initial_mrng_rstate = copy.deepcopy(self._mrng.rstate)

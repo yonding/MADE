@@ -20,9 +20,9 @@ def batch_get_nearest_neighbours(samples, dataset):
     sample = Te.matrix(name="sample")
     data = Te.matrix(name="dataset")
     find_nearest_neighbour = theano.function(name="find_nearest_neighbour",
-                                             inputs=[sample],
-                                             outputs=data[Te.argmin(Te.sum((data[:, None, :] - sample) ** 2, axis=2), axis=0)],
-                                             givens={data: dataset['train']['data']})
+                                            inputs=[sample],
+                                            outputs=data[Te.argmin(Te.sum((data[:, None, :] - sample) ** 2, axis=2), axis=0)],
+                                            givens={data: dataset['train']['data']})
     return find_nearest_neighbour(samples)
 
 
@@ -30,9 +30,9 @@ def get_nearest_neighbours(samples, dataset):
     sample = Te.vector(name="sample")
     data = Te.matrix(name="dataset")
     find_nearest_neighbour = theano.function(name="find_nearest_neighbour",
-                                             inputs=[sample],
+                                            inputs=[sample],
                                              outputs=data[Te.argmin(Te.sum((data - sample) ** 2, axis=1))],
-                                             givens={data: dataset['train']['data']})
+                                            givens={data: dataset['train']['data']})
     neighbours = []
     for s in samples:
         neighbours += [find_nearest_neighbour(s)]
@@ -57,10 +57,10 @@ def get_model(model_path):
 
     model = build_model(dataset, trainingparams, hyperparams, hyperparams['hidden_sizes'])
 
-    print "### Loading model | Hidden:{0} CondMask:{1} Activation:{2} ... ".format(hyperparams['hidden_sizes'], hyperparams['use_cond_mask'], hyperparams['hidden_activation']),
+    print("### Loading model | Hidden:{0} CondMask:{1} Activation:{2} ... ".format(hyperparams['hidden_sizes'], hyperparams['use_cond_mask'], hyperparams['hidden_activation']),)
     start_time = t.time()
     load_model_params(model, model_path)
-    print utils.get_done_text(start_time), "###"
+    print(utils.get_done_text(start_time), "###")
 
     return model, dataset_name, dataset
 
@@ -86,8 +86,8 @@ if __name__ == '__main__':
     model, dataset_name, dataset = get_model(args.model_path)
 
     for run in range(args.nb_images):
-        print "Image {0}".format(run)
-        print "### Generating {} samples ...".format(args.nb_samples_per_row * args.nb_rows),
+        print("Image {0}".format(run))
+        print("### Generating {} samples ...".format(args.nb_samples_per_row * args.nb_rows),)
         name = "_samples_run{}".format(run)
 
         start_time = t.time()
@@ -98,13 +98,13 @@ if __name__ == '__main__':
                 samples = np.vstack([model.sample(args.nb_samples_per_row, i), samples])
         else:
             samples = model.sample(args.nb_samples_per_row * args.nb_rows)
-        print utils.get_done_text(start_time), "###"
+        print(utils.get_done_text(start_time), "###")
 
         if args.find_nearest_neighbour:
-            print "### Finding neighbours ...",
+            print("### Finding neighbours ...",)
             start_time = t.time()
             samples_neighbours = get_nearest_neighbours(samples, dataset)
-            print utils.get_done_text(start_time), "###"
+            print(utils.get_done_text(start_time), "###")
 
             save_samples(args.nb_samples_per_row, args.nb_rows, samples_neighbours, dataset_name + name + "_neighbours", os.path.basename(args.model_path))
 

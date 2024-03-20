@@ -50,11 +50,11 @@ def write_result(dataset_name, model_info, experiment_name):
     result += ["{0:.4f}".format(model_info[-1])]
     result += [experiment_name]
 
-    print "### Saving result to file ...",
+    print("### Saving result to file ...",)
     start_time = t.time()
     write_result_file(dataset_name, header, result)
 
-    print get_done_text(start_time)
+    print(get_done_text(start_time))
 
 
 def write_result_file(dataset_name, header, result):
@@ -85,10 +85,10 @@ def load_dict_from_json_file(path):
 
 def printParams(model):
     for l in model.layers:
-        print "\t#",
+        print("\t#",)
         for p in l.params:
-            print p,
-        print
+            print(p,)
+        print()
 
 
 def print_computational_graphs(model, hidden_sizes, shuffle_mask, use_cond_mask, direct_input_connect):
